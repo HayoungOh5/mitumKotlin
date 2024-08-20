@@ -6,7 +6,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import kotlinx.serialization.json.jsonPrimitive
 
 // accSign 함수
-fun accSign(publicKey: String, privateKey: String, operation: Operation): Operation {
+fun accSign(privateKey: String, operation: Operation): Operation {
     Security.addProvider(BouncyCastleProvider())
 
     val networkID = "mitum"
@@ -14,13 +14,16 @@ fun accSign(publicKey: String, privateKey: String, operation: Operation): Operat
 
     val factHash = operation.fact["hash"]?.jsonPrimitive?.content
     val decodedFactHash = Base58.decode(factHash)
-    val encodedSignature = Base58.encode(ethSign(
+
+    // generate publicKey and sigature
+    val (publicKey, sigBuffer) = ethSign(
         privateKey.substring(0, privateKey.length - 3),
         networkID.toByteArray(StandardCharsets.UTF_8) +
         decodedFactHash +
         now.UTC().toByteArray(StandardCharsets.UTF_8)
-    ))
+    )
 
+    val encodedSignature = Base58.encode(sigBuffer)
     val updatedSigns = operation.signs.toMutableList()
 
     val newSign = Sign(

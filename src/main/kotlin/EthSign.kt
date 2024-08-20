@@ -12,7 +12,7 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.Security
 
-fun ethSign(privateKeyHex: String, msg: ByteArray): ByteArray {
+fun ethSign(privateKeyHex: String, msg: ByteArray): Pair<String, ByteArray> {
     // BouncyCastleProvider를 추가
     Security.addProvider(BouncyCastleProvider())
 
@@ -34,7 +34,6 @@ fun ethSign(privateKeyHex: String, msg: ByteArray): ByteArray {
 
     // ECPrivateKeyParameters를 생성
     val privateKeyParams = ECPrivateKeyParameters(privateKeyBigInt, params)
-    // println(privateKeyParams)
 
     // 서명 생성기 인스턴스를 생성
     val signer = ECDSASigner()
@@ -60,5 +59,11 @@ fun ethSign(privateKeyHex: String, msg: ByteArray): ByteArray {
     System.arraycopy(rBytes, 0, sigBuffer, 4, rBytes.size)
     System.arraycopy(sBytes, 0, sigBuffer, 4 + rBytes.size, sBytes.size)
 
-    return sigBuffer
+    // comporessed publickey 생성
+    val publicKeyPoint: ECPoint = g.multiply(privateKeyBigInt)
+    val publicKeyCompressed = publicKeyPoint.getEncoded(true)
+    val publicKeyHex = Hex.toHexString(publicKeyCompressed)
+    val publickey = publicKeyHex + "fpu"
+
+    return Pair(publickey, sigBuffer)
 }
