@@ -20,7 +20,7 @@ MitumKotlin is an early version tool for signing Mitum operations (transactions)
 
 ```sh
 git clone https://github.com/HayoungOh5/mitumKotlin.git
-cd mitumkotlin
+cd mitumKotlin
 ```
 
 ## Building the Project
